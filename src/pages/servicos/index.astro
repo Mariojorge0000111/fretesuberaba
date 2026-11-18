@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cta from '../../components/Cta.astro';
+import Img from '../../components/Img.astro';
+import { SERVICOS } from '../../data/servicos';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Início', item: new URL('/', Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: 'Serviços', item: new URL('/servicos/', Astro.site).href },
+  ],
+};
+---
+<Base title="Serviços de Frete e Mudança em Uberaba" description="Mudança residencial e comercial, pequenas mudanças e carretos, frete de móveis, montagem e mudança para outras cidades a partir de Uberaba. Veja cada serviço." schema={schema}>
+  <section class="hero-pagina">
+    <div class="wrap">
+      <nav class="migalhas" aria-label="Você está em"><a href="/">Início</a> / Serviços</nav>
+      <h1>Serviços de frete e mudança em Uberaba</h1>
+      <p class="lead" style="margin-top:18px">Seis serviços, do carreto de um item só à mudança de uma empresa inteira. Todos com orçamento antes pelo WhatsApp.</p>
+    </div>
+  </section>
+  <section class="wrap" style="padding-bottom:96px">
+    <div class="cards">
+      {SERVICOS.map((s) => (
+        <a class="card" href={`/servicos/${s.slug}/`}>
+          <Img nome={s.imagem} alt={s.imagemAlt} sizes="(max-width: 760px) 100vw, 33vw" />
+          <h3>{s.h1}</h3>
+          <p>{s.resumo}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+  <Cta />
+</Base>

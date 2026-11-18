@@ -1,0 +1,41 @@
+import { hojeISO } from '../config';
+
+// Artigos ficam em src/content/blog/*.md. Só entram no site os que têm data <= hoje (fuso de Uberaba).
+// A automação diária do GitHub refaz o site e libera os agendados na data certa.
+export interface Post {
+  slug: string;
+  titulo: string;
+  descricao: string;
+  data: string;
+  atualizado?: string;
+  imagem: string;
+  imagemAlt: string;
+  palavraChave: string;
+  servico?: string;
+  bairro?: string;
+  cidade?: string;
+  Content: any;
+  compiledContent: () => string | Promise<string>;
+}
+
+const arquivos = import.meta.glob('../content/blog/*.md', { eager: true }) as Record<string, any>;
+
+export const TODOS: Post[] = Object.entries(arquivos).map(([caminho, m]) => ({
+  slug: caminho.split('/').pop()!.replace(/\.md$/, ''),
+  ...m.frontmatter,
+  Content: m.Content,
+  compiledContent: m.compiledContent,
+}));
+
+const hoje = hojeISO();
+export const POSTS: Post[] = TODOS.filter((p) => p.data <= hoje).sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : a.slug.localeCompare(b.slug)));
+const publicados = new Set(POSTS.map((p) => p.slug));
+
+export const publicado = (slug: string) => publicados.has(slug);
+export const post = (slug: string) => POSTS.find((p) => p.slug === slug);
+export const postsDe = (slugs: string[]) => slugs.map(post).filter((p): p is Post => Boolean(p));
+
+// Remove o link (mantém o texto) de artigos ainda não publicados
+export function semLinksFuturos(html: string): string {
+  return html.replace(/<a href="\/blog\/([a-z0-9-]+)\/"[^>]*>(.*?)<\/a>/g, (tudo, slug, texto) => (publicados.has(slug) ? tudo : texto));
+}

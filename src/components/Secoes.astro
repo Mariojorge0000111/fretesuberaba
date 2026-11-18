@@ -1,0 +1,23 @@
+---
+// Renderiza seções de texto vindas dos arquivos de dados (h2, parágrafos, listas, tabelas)
+import { md } from '../lib/md';
+interface Secao { h2: string; paragrafos?: string[]; lista?: string[]; tabela?: { cabecalho: string[]; linhas: string[][] }; depois?: string[] }
+interface Props { secoes: Secao[] }
+const { secoes } = Astro.props;
+---
+{secoes.map((sec) => (
+  <>
+    <h2>{sec.h2}</h2>
+    {sec.paragrafos?.map((p) => <p set:html={md(p)} />)}
+    {sec.lista && <ul>{sec.lista.map((i) => <li set:html={md(i)} />)}</ul>}
+    {sec.tabela && (
+      <div class="tabela-rolagem">
+        <table>
+          <thead><tr>{sec.tabela.cabecalho.map((c) => <th>{c}</th>)}</tr></thead>
+          <tbody>{sec.tabela.linhas.map((l) => <tr>{l.map((c) => <td set:html={md(c)} />)}</tr>)}</tbody>
+        </table>
+      </div>
+    )}
+    {sec.depois?.map((p) => <p set:html={md(p)} />)}
+  </>
+))}

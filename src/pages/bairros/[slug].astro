@@ -1,0 +1,115 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cta from '../../components/Cta.astro';
+import CtaMeio from '../../components/CtaMeio.astro';
+import Faq from '../../components/Faq.astro';
+import Img from '../../components/Img.astro';
+import Secoes from '../../components/Secoes.astro';
+import WaIcon from '../../components/WaIcon.astro';
+import { linkWhatsapp } from '../../config';
+import { BAIRROS, bairro as achar, type Bairro } from '../../data/bairros';
+import { SERVICOS } from '../../data/servicos';
+import { postsDe } from '../../lib/posts';
+import { puro } from '../../lib/md';
+
+export function getStaticPaths() {
+  return BAIRROS.map((b) => ({ params: { slug: b.slug }, props: { b } }));
+}
+const { b } = Astro.props as { b: Bairro };
+const url = new URL(`/bairros/${b.slug}/`, Astro.site).href;
+const local = `${b.prep} ${b.nome}`;
+const proximos = b.proximos.map(achar).filter((x): x is Bairro => Boolean(x));
+const artigos = postsDe(b.artigos).slice(0, 3);
+const msg = `Olá! Vim pelo site Fretes Uberaba (página do bairro ${b.nome}) e quero um orçamento de frete/mudança.`;
+const [primeira, ...demais] = b.secoes;
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: b.h1,
+    serviceType: 'Frete e mudança',
+    areaServed: { '@type': 'Place', name: `${b.nome}, Uberaba - MG` },
+    provider: { '@id': new URL('/#empresa', Astro.site).href },
+    url,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: b.faq.map((f) => ({ '@type': 'Question', name: f.p, acceptedAnswer: { '@type': 'Answer', text: puro(f.r) } })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: new URL('/', Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: 'Bairros', item: new URL('/bairros/', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: b.nome, item: url },
+    ],
+  },
+];
+---
+<Base title={b.titulo} description={b.descricao} schema={schema} msg={msg}>
+  <section class="hero-pagina">
+    <div class="wrap">
+      <nav class="migalhas" aria-label="Você está em"><a href="/">Início</a> / <a href="/bairros/">Bairros</a> / {b.nome}</nav>
+      <h1>{b.h1}</h1>
+      <p class="lead" style="margin-top:18px">{b.sobre}</p>
+      <div class="acoes"><a class="btn" href={linkWhatsapp(msg)} target="_blank" rel="noopener"><WaIcon /> Pedir orçamento no WhatsApp</a></div>
+    </div>
+  </section>
+
+  <section class="texto conteudo">
+    <Secoes secoes={[primeira]} />
+    <CtaMeio texto={`Vai mudar ${local}? Mande a lista dos itens e o endereço de destino.`} mensagem={msg} />
+    <Secoes secoes={demais} />
+  </section>
+
+  <section class="wrap" style="margin-top:56px">
+    <h2 style="font-size:clamp(1.6rem,3vw,2.2rem)">Serviços {local}</h2>
+    {SERVICOS.map((s) => (
+      <article class="servico-linha">
+        <h3><a class="link" href={`/servicos/${s.slug}/`} style="color:var(--grafite)">{s.nome}</a></h3>
+        <div>
+          <p>{s.resumo}</p>
+          <p><a class="link" href={`/servicos/${s.slug}/`}>Como funciona →</a></p>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <section class="secao">
+    <div class="texto">
+      <h2 style="margin-bottom:28px">Perguntas sobre mudança {local}</h2>
+      <Faq itens={b.faq} />
+    </div>
+  </section>
+
+  {artigos.length > 0 && (
+    <section class="secao secao-branca">
+      <div class="wrap">
+        <div class="cabeca"><h2>Guias úteis para a sua mudança</h2></div>
+        <div class="cards">
+          {artigos.map((p) => (
+            <a class="card" href={`/blog/${p.slug}/`}>
+              <Img nome={p.imagem} alt={p.imagemAlt} sizes="(max-width: 760px) 100vw, 33vw" />
+              <h3>{p.titulo}</h3>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="secao secao-areia">
+    <div class="wrap">
+      <h2 style="margin-bottom:28px">Bairros vizinhos</h2>
+      <ul class="chips">
+        {proximos.map((p) => <li><a href={`/bairros/${p.slug}/`}>Frete e mudança {p.prep} {p.nome}</a></li>)}
+        <li><a href="/bairros/">Todos os bairros</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <Cta titulo={`Mudança ${local}? Peça seu orçamento.`} mensagem={msg} />
+</Base>

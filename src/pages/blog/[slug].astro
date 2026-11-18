@@ -1,0 +1,107 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cta from '../../components/Cta.astro';
+import Faq from '../../components/Faq.astro';
+import Img from '../../components/Img.astro';
+import { SITE, linkWhatsapp } from '../../config';
+import { POSTS, semLinksFuturos, type Post } from '../../lib/posts';
+import { servico } from '../../data/servicos';
+import { bairro } from '../../data/bairros';
+import { cidade } from '../../data/cidades';
+import { puro } from '../../lib/md';
+
+export function getStaticPaths() {
+  return POSTS.map((p) => ({ params: { slug: p.slug }, props: { p } }));
+}
+const { p } = Astro.props as { p: Post & { faq?: { p: string; r: string }[] } };
+const url = new URL(`/blog/${p.slug}/`, Astro.site).href;
+const dataBR = new Date(p.data + 'T12:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+const msg = `Olá! Vim pelo site Fretes Uberaba (artigo: ${p.titulo}) e quero um orçamento.`;
+const icone = '<svg class="ico-wa" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.2.6 4.4 1.7 6.3L3 29l7.3-1.9c1.8 1 3.8 1.5 5.8 1.5 7 0 12.7-5.7 12.7-12.6C28.7 8.6 23 3 16 3z"/></svg>';
+const ctaHtml = `<div class="cta-meio"><p>Precisa de frete ou mudança em Uberaba? Mande o que vai levar e os endereços e receba o orçamento.</p><a class="btn" href="${linkWhatsapp(msg)}" target="_blank" rel="noopener">${icone} Chamar no WhatsApp</a></div>`;
+const html = semLinksFuturos(await p.compiledContent()).replace(/<p>\[\[CTA\]\]<\/p>/g, ctaHtml);
+const sv = p.servico ? servico(p.servico) : undefined;
+const br = p.bairro ? bairro(p.bairro) : undefined;
+const cd = p.cidade ? cidade(p.cidade) : undefined;
+const outros = POSTS.filter((o) => o.slug !== p.slug && (o.servico === p.servico)).concat(POSTS.filter((o) => o.slug !== p.slug && o.servico !== p.servico)).slice(0, 3);
+
+const schema: object[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: p.titulo,
+    description: p.descricao,
+    image: new URL(`/images/${p.imagem}.webp`, Astro.site).href,
+    datePublished: p.data,
+    dateModified: p.atualizado ?? p.data,
+    author: { '@type': 'Organization', name: SITE.nome, url: new URL('/', Astro.site).href },
+    publisher: { '@id': new URL('/#empresa', Astro.site).href },
+    mainEntityOfPage: url,
+    inLanguage: 'pt-BR',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: new URL('/', Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: new URL('/blog/', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: p.titulo, item: url },
+    ],
+  },
+];
+if (p.faq?.length) {
+  schema.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: p.faq.map((f) => ({ '@type': 'Question', name: f.p, acceptedAnswer: { '@type': 'Answer', text: puro(f.r) } })),
+  });
+}
+---
+<Base title={p.titulo} description={p.descricao} schema={schema} ogType="article" ogImage={p.imagem} msg={msg}>
+  <section class="hero-pagina">
+    <div class="texto">
+      <nav class="migalhas" aria-label="Você está em"><a href="/">Início</a> / <a href="/blog/">Blog</a></nav>
+      <h1 style="font-size:clamp(2rem,4.6vw,3.1rem)">{p.titulo}</h1>
+      <p class="post-meta"><time datetime={p.data}>{dataBR}</time></p>
+    </div>
+  </section>
+  <div class="post-capa"><Img nome={p.imagem} alt={p.imagemAlt} prioridade sizes="(max-width: 1040px) 100vw, 1000px" /></div>
+  <article class="texto conteudo">
+    <Fragment set:html={html} />
+
+    {p.faq?.length && (
+      <>
+        <h2>Perguntas frequentes</h2>
+        <Faq itens={p.faq} />
+      </>
+    )}
+
+    {(sv || br || cd) && (
+      <>
+        <h2>Veja também</h2>
+        <ul>
+          {sv && <li><a href={`/servicos/${sv.slug}/`}>{sv.h1}</a></li>}
+          {br && <li><a href={`/bairros/${br.slug}/`}>{br.h1}</a></li>}
+          {cd && <li><a href={`/cidades/${cd.slug}/`}>{cd.h1}</a></li>}
+        </ul>
+      </>
+    )}
+  </article>
+
+  {outros.length > 0 && (
+    <section class="secao">
+      <div class="wrap">
+        <h2 style="margin-bottom:32px">Leia também</h2>
+        <div class="cards">
+          {outros.map((o) => (
+            <a class="card" href={`/blog/${o.slug}/`}>
+              <Img nome={o.imagem} alt={o.imagemAlt} sizes="(max-width: 760px) 100vw, 33vw" />
+              <h3>{o.titulo}</h3>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+  <Cta mensagem={msg} />
+</Base>

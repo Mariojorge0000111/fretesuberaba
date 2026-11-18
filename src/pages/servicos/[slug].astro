@@ -1,0 +1,119 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cta from '../../components/Cta.astro';
+import CtaMeio from '../../components/CtaMeio.astro';
+import Faq from '../../components/Faq.astro';
+import Img from '../../components/Img.astro';
+import Secoes from '../../components/Secoes.astro';
+import WaIcon from '../../components/WaIcon.astro';
+import { linkWhatsapp } from '../../config';
+import { SERVICOS, type Servico } from '../../data/servicos';
+import { BAIRROS } from '../../data/bairros';
+import { CIDADES } from '../../data/cidades';
+import { postsDe } from '../../lib/posts';
+import { md, puro } from '../../lib/md';
+
+export function getStaticPaths() {
+  return SERVICOS.map((s) => ({ params: { slug: s.slug }, props: { s } }));
+}
+const { s } = Astro.props as { s: Servico };
+const url = new URL(`/servicos/${s.slug}/`, Astro.site).href;
+const artigos = postsDe(s.artigos).slice(0, 3);
+const outros = SERVICOS.filter((o) => o.slug !== s.slug);
+const msg = `Olá! Vim pelo site Fretes Uberaba (página ${s.nome}) e quero um orçamento.`;
+const [primeira, ...demais] = s.secoes;
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: s.h1,
+    serviceType: s.nome,
+    description: s.descricao,
+    areaServed: { '@type': 'City', name: 'Uberaba', containedInPlace: { '@type': 'State', name: 'Minas Gerais' } },
+    provider: { '@id': new URL('/#empresa', Astro.site).href },
+    url,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: s.faq.map((f) => ({ '@type': 'Question', name: f.p, acceptedAnswer: { '@type': 'Answer', text: puro(f.r) } })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: new URL('/', Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: 'Serviços', item: new URL('/servicos/', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: s.nome, item: url },
+    ],
+  },
+];
+---
+<Base title={s.title} description={s.descricao} schema={schema} ogImage={s.imagem} msg={msg}>
+  <section class="hero-pagina">
+    <div class="wrap">
+      <nav class="migalhas" aria-label="Você está em"><a href="/">Início</a> / <a href="/servicos/">Serviços</a> / {s.nome}</nav>
+      <h1>{s.h1}</h1>
+      <p class="lead" style="margin-top:18px">{s.resumo}</p>
+      <div class="acoes"><a class="btn" href={linkWhatsapp(msg)} target="_blank" rel="noopener"><WaIcon /> Pedir orçamento no WhatsApp</a></div>
+    </div>
+  </section>
+  <div class="post-capa"><Img nome={s.imagem} alt={s.imagemAlt} prioridade sizes="(max-width: 1040px) 100vw, 1000px" /></div>
+
+  <section class="texto conteudo">
+    {s.intro.map((p) => <p set:html={md(p)} />)}
+    <h2>O que está incluso</h2>
+    <ul class="check">{s.inclui.map((i) => <li>{i}</li>)}</ul>
+    <Secoes secoes={[primeira]} />
+    <CtaMeio mensagem={msg} />
+    <Secoes secoes={demais} />
+
+    <h2>{s.nome} em todos os bairros de Uberaba</h2>
+    <p>Atendemos todos os bairros da cidade. Veja como funciona no seu:</p>
+  </section>
+  <div class="wrap" style="margin-top:20px">
+    <ul class="chips" style="max-width:900px">
+      {BAIRROS.map((b) => <li><a href={`/bairros/${b.slug}/`}>{b.nome}</a></li>)}
+      <li><a href="/bairros/">Todos os bairros</a></li>
+    </ul>
+    {s.slug === 'mudanca-para-outras-cidades' && (
+      <ul class="chips" style="max-width:900px;margin-top:12px">
+        {CIDADES.map((c) => <li><a href={`/cidades/${c.slug}/`}>Uberaba ↔ {c.nome}</a></li>)}
+      </ul>
+    )}
+  </div>
+
+  <section class="secao">
+    <div class="texto">
+      <h2 style="margin-bottom:28px">Perguntas frequentes</h2>
+      <Faq itens={s.faq} />
+    </div>
+  </section>
+
+  {artigos.length > 0 && (
+    <section class="secao secao-branca">
+      <div class="wrap">
+        <div class="cabeca"><h2>Leia antes de contratar</h2></div>
+        <div class="cards">
+          {artigos.map((p) => (
+            <a class="card" href={`/blog/${p.slug}/`}>
+              <Img nome={p.imagem} alt={p.imagemAlt} sizes="(max-width: 760px) 100vw, 33vw" />
+              <h3>{p.titulo}</h3>
+              <p>{p.descricao}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="secao secao-areia">
+    <div class="wrap">
+      <div class="cabeca"><h2>Outros serviços</h2></div>
+      <ul class="chips">{outros.map((o) => <li><a href={`/servicos/${o.slug}/`}>{o.nome}</a></li>)}</ul>
+    </div>
+  </section>
+
+  <Cta mensagem={msg} />
+</Base>

@@ -1,0 +1,179 @@
+---
+import Base from '../layouts/Base.astro';
+import Cta from '../components/Cta.astro';
+import Faq from '../components/Faq.astro';
+import Img from '../components/Img.astro';
+import WaIcon from '../components/WaIcon.astro';
+import { linkWhatsapp } from '../config';
+import { SERVICOS } from '../data/servicos';
+import { BAIRROS, OUTROS_BAIRROS } from '../data/bairros';
+import { CIDADES } from '../data/cidades';
+import { POSTS } from '../lib/posts';
+import { puro } from '../lib/md';
+
+const faq = [
+  { p: 'Quanto custa um frete ou uma mudança em Uberaba?', r: 'Depende do volume, da distância, do acesso (escada, elevador, rua), do número de ajudantes e de serviços como montagem e embalagem. Você manda a lista e os endereços pelo WhatsApp e recebe o valor fechado antes de confirmar.' },
+  { p: 'Vocês atendem quais bairros?', r: 'Todos os bairros de Uberaba, do Centro e da Abadia ao Recreio dos Bandeirantes, ao Elza Amui e ao Jockey Park. Veja a lista em [bairros atendidos](/bairros/).' },
+  { p: 'Fazem mudança para outras cidades?', r: 'Sim. Uberlândia, Araxá, Sacramento, Delta, Frutal, Conceição das Alagoas, Igarapava e capitais como Belo Horizonte e São Paulo. Veja [mudança para outras cidades](/servicos/mudanca-para-outras-cidades/).' },
+  { p: 'Com quanto tempo de antecedência devo pedir?', r: 'Carretos e fretes pequenos podem encaixar em poucos dias. Mudanças completas pedem de uma a duas semanas, principalmente no fim e no começo do mês.' },
+  { p: 'Vocês desmontam e montam os móveis?', r: 'Sim, quando combinado: guarda-roupas, camas, racks, mesas e estantes.' },
+  { p: 'Este site é para quem quer contratar ou para quem oferece frete?', r: 'Para quem quer contratar. Se você precisa levar móveis, fazer uma mudança ou um carreto em Uberaba, é aqui. Não divulgamos cargas para caminhoneiros.' },
+];
+const schemaFaq = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.p, acceptedAnswer: { '@type': 'Answer', text: puro(f.r) } })),
+};
+const recentes = POSTS.slice(0, 3);
+const msg = 'Olá! Vim pelo site Fretes Uberaba (página inicial) e quero um orçamento de frete/mudança.';
+---
+<Base
+  title="Fretes e Mudanças em Uberaba | Orçamento pelo WhatsApp"
+  description="Fretes e mudanças em Uberaba (MG): mudança residencial e comercial, carreto, frete de móveis e mudança para outras cidades. Orçamento rápido pelo WhatsApp."
+  preloadImg="hero"
+  schema={schemaFaq}
+  msg={msg}
+>
+  <section class="hero">
+    <div class="wrap hero-grade">
+      <div>
+        <span class="etiqueta">Uberaba · MG</span>
+        <h1>Fretes e mudanças em Uberaba</h1>
+        <p class="lead">Fretes, carretos e mudanças em Uberaba e no Triângulo Mineiro, de um sofá a uma casa inteira. Você manda o que precisa levar e recebe o orçamento pelo WhatsApp, com o valor combinado antes.</p>
+        <div class="acoes">
+          <a class="btn" href={linkWhatsapp(msg)} target="_blank" rel="noopener"><WaIcon /> Pedir orçamento no WhatsApp</a>
+          <a class="link" href="/orcamento/">Preencher formulário</a>
+        </div>
+        <ul class="hero-pontos">
+          <li>Todos os bairros de Uberaba</li>
+          <li>Preço combinado antes</li>
+          <li>Montagem de móveis</li>
+        </ul>
+      </div>
+      <div class="hero-foto">
+        <Img nome="hero" alt="Dois carregadores organizando caixas de papelão ao lado de uma van" prioridade sizes="(max-width: 760px) 100vw, 45vw" />
+      </div>
+    </div>
+  </section>
+
+  <section class="secao secao-branca">
+    <div class="wrap">
+      <div class="cabeca">
+        <h2>Do carreto à casa inteira.</h2>
+        <p class="lead">Escolha pelo tamanho do que você vai levar. Se ficar em dúvida, mande fotos que a gente indica o serviço certo.</p>
+      </div>
+      <div class="servicos-grade">
+        {SERVICOS.map((s, i) => (
+          <a class="tile" href={`/servicos/${s.slug}/`}>
+            <span class="tile-num">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.nome}</h3>
+            <p>{s.resumo}</p>
+            <span class="tile-seta">Ver serviço →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="wrap dividido">
+      <div>
+        <h2>Frete e mudança em Uberaba, do jeito certo.</h2>
+        <p class="lead">Uberaba tem de tudo: prédio antigo sem elevador no Centro, república de estudante na Abadia, condomínio fechado perto da BR-050, sobrado de escada estreita no São Benedito. Cada endereço pede um caminhão, uma equipe e um horário diferentes.</p>
+        <p style="margin-top:16px">Por isso o orçamento começa por perguntas simples: o que vai, de onde, para onde, se tem escada ou elevador e para quando. Com fotos, o valor sai mais justo e o dia da mudança não tem surpresa.</p>
+      </div>
+      <Img nome="como-funciona" alt="Casal sentado entre caixas de mudança consultando um caderno de anotações" />
+    </div>
+  </section>
+
+  <section class="secao secao-escura">
+    <div class="wrap">
+      <div class="cabeca">
+        <h2>O que vale para qualquer serviço.</h2>
+      </div>
+      <div class="compromissos">
+        <div>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e07a52" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <h3>Preço antes</h3>
+          <p>O valor é passado antes de você confirmar. Nada de conta nova no fim do dia.</p>
+        </div>
+        <div>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e07a52" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <h3>Horário combinado</h3>
+          <p>Data e horário definidos com antecedência, respeitando a regra do seu condomínio.</p>
+        </div>
+        <div>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e07a52" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>
+          <h3>Móveis protegidos</h3>
+          <p>Mantas, cintas e carrinho de carga. Cada peça viaja presa e embrulhada.</p>
+        </div>
+        <div>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e07a52" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
+          <h3>Tudo pelo WhatsApp</h3>
+          <p>Do orçamento à entrega do último móvel, a conversa é direta e fica registrada.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="wrap">
+      <div class="cabeca"><h2>Como funciona.</h2></div>
+      <ol class="passos">
+        <li><h3>Você conta o que precisa</h3><p>Itens, bairros de origem e destino e a data. Fotos ajudam muito.</p></li>
+        <li><h3>Recebe o orçamento</h3><p>Valor fechado, considerando veículo, acesso, ajudantes e extras.</p></li>
+        <li><h3>Agenda o dia</h3><p>Data e horário confirmados, já alinhados com o prédio ou condomínio.</p></li>
+        <li><h3>A mudança acontece</h3><p>Carga, transporte, descarga e montagem no lugar certo.</p></li>
+      </ol>
+      <p class="acoes"><a class="link" href="/como-funciona/">Ver todos os detalhes</a></p>
+    </div>
+  </section>
+
+  <section class="secao secao-areia">
+    <div class="wrap">
+      <div class="cabeca">
+        <h2>Uberaba inteira, bairro por bairro.</h2>
+        <p class="lead">Veja como funciona o frete e a mudança no seu bairro.</p>
+      </div>
+      <ul class="chips">
+        {BAIRROS.map((b) => <li><a href={`/bairros/${b.slug}/`}>{b.nome}</a></li>)}
+        <li><a href="/bairros/">+ {OUTROS_BAIRROS.length} bairros</a></li>
+      </ul>
+      <div class="cabeca" style="margin-top:64px">
+        <h2>E para fora da cidade.</h2>
+        <p class="lead">Mudanças e fretes entre Uberaba e a região, nos dois sentidos.</p>
+      </div>
+      <ul class="chips">
+        {CIDADES.map((c) => <li><a href={`/cidades/${c.slug}/`}>{c.nome}</a></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="texto">
+      <div class="cabeca"><h2>Perguntas frequentes</h2></div>
+      <Faq itens={faq} />
+      <p class="acoes"><a class="link" href="/perguntas-frequentes/">Mais perguntas e respostas</a></p>
+    </div>
+  </section>
+
+  {recentes.length > 0 && (
+    <section class="secao secao-branca">
+      <div class="wrap">
+        <div class="cabeca"><h2>Guias para planejar sua mudança</h2></div>
+        <div class="cards">
+          {recentes.map((p) => (
+            <a class="card" href={`/blog/${p.slug}/`}>
+              <Img nome={p.imagem} alt={p.imagemAlt} sizes="(max-width: 760px) 100vw, 33vw" />
+              <h3>{p.titulo}</h3>
+              <p>{p.descricao}</p>
+            </a>
+          ))}
+        </div>
+        <p class="acoes"><a class="link" href="/blog/">Ver todos os artigos</a></p>
+      </div>
+    </section>
+  )}
+
+  <Cta mensagem={msg} />
+</Base>

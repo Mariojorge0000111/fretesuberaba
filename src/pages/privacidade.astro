@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../config';
+---
+<Base title="Política de Privacidade" description={`Como o site ${SITE.nome} trata os dados de quem pede orçamento de frete e mudança pelo WhatsApp.`}>
+  <section class="hero-pagina"><div class="texto"><h1>Política de privacidade</h1></div></section>
+  <section class="texto conteudo" style="padding-bottom:96px">
+    <p>O site {SITE.nome} não tem cadastro, não usa cookies de publicidade e não guarda os dados digitados no formulário de orçamento.</p>
+    <p>Quando você preenche o formulário, o próprio navegador monta uma mensagem e abre o WhatsApp. Nada é enviado antes de você tocar em enviar dentro do WhatsApp. A partir daí, a conversa segue as regras do WhatsApp.</p>
+    <p>Os dados que você mandar na conversa (nome, endereços, lista de itens, fotos) são usados apenas para preparar o orçamento e realizar o serviço contratado.</p>
+    <p>A hospedagem do site pode registrar dados técnicos de acesso, como endereço IP e navegador, para segurança e estatísticas agregadas.</p>
+    <p>Para pedir a exclusão de dados enviados pelo WhatsApp, basta solicitar na própria conversa.</p>
+  </section>
+</Base>

@@ -1,0 +1,158 @@
+---
+import { SITE, linkWhatsapp } from '../config';
+import { SERVICOS } from '../data/servicos';
+import { BAIRROS } from '../data/bairros';
+import { CIDADES } from '../data/cidades';
+import WaIcon from '../components/WaIcon.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  schema?: object | object[];
+  ogType?: string;
+  ogImage?: string;
+  preloadImg?: string;
+  msg?: string; // mensagem do WhatsApp citando a página
+  noindex?: boolean;
+}
+
+const { title, description, schema, ogType = 'website', ogImage = 'hero', preloadImg, msg, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const comMarca = `${title} | ${SITE.nome}`;
+const fullTitle = title.includes(SITE.nome) || comMarca.length > 62 ? title : comMarca;
+const imagemOg = new URL(`/images/${ogImage}.webp`, Astro.site).href;
+
+const negocio = {
+  '@context': 'https://schema.org',
+  '@type': 'MovingCompany',
+  '@id': new URL('/#empresa', Astro.site).href,
+  name: SITE.nome,
+  description: SITE.slogan,
+  url: new URL('/', Astro.site).href,
+  image: new URL('/images/hero.webp', Astro.site).href,
+  areaServed: [
+    { '@type': 'City', name: 'Uberaba', containedInPlace: { '@type': 'State', name: 'Minas Gerais' } },
+    ...CIDADES.map((c) => ({ '@type': 'City', name: c.nome })),
+  ],
+  openingHours: 'Mo-Sa 07:00-19:00',
+  ...(SITE.telefone ? { telephone: SITE.telefone } : {}),
+};
+const schemas = [negocio, ...(schema ? (Array.isArray(schema) ? schema : [schema]) : [])];
+
+const menu = [
+  { href: '/servicos/', nome: 'Serviços' },
+  { href: '/bairros/', nome: 'Bairros' },
+  { href: '/cidades/', nome: 'Outras cidades' },
+  { href: '/blog/', nome: 'Blog' },
+  { href: '/perguntas-frequentes/', nome: 'Dúvidas' },
+  { href: '/como-funciona/', nome: 'Como funciona' },
+];
+const atual = Astro.url.pathname;
+const wa = linkWhatsapp(msg);
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imagemOg} />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content={SITE.nome} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#faf8f5" />
+    <meta name="geo.region" content="BR-MG" />
+    <meta name="geo.placename" content="Uberaba" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href="/fonts/manrope-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/manrope-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+    {preloadImg && <link rel="preload" as="image" href={`/images/${preloadImg}.webp`} imagesrcset={`/images/${preloadImg}-800.webp 800w, /images/${preloadImg}.webp 1600w`} imagesizes="(max-width: 760px) 100vw, 45vw" fetchpriority="high" />}
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+    {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+  </head>
+  <body>
+    <header class="topo">
+      <div class="wrap topo-inner">
+        <a href="/" class="marca" aria-label={`${SITE.nome}, página inicial`}>
+          <span class="marca-sinal" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><path d="M2 6h12v10H2zM14 9h4l4 4v3h-8z"/><circle cx="6.5" cy="17.5" r="1.6" fill="#fff"/><circle cx="17.5" cy="17.5" r="1.6" fill="#fff"/></svg>
+          </span>
+          <span>{SITE.nome}</span>
+        </a>
+        <nav aria-label="Menu principal">
+          <ul class="menu">
+            {menu.map((m) => <li><a href={m.href} aria-current={atual.startsWith(m.href) ? 'page' : undefined}>{m.nome}</a></li>)}
+          </ul>
+          <details class="menu-mobile">
+            <summary>Menu</summary>
+            <ul>
+              <li><a href="/">Início</a></li>
+              {menu.map((m) => <li><a href={m.href}>{m.nome}</a></li>)}
+              <li><a href="/orcamento/">Pedir orçamento</a></li>
+            </ul>
+          </details>
+        </nav>
+        <a class="btn btn-sm" href="/orcamento/">Orçamento</a>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="rodape">
+      <div class="wrap">
+        <div class="rodape-grade">
+          <div>
+            <a href="/" class="marca">
+              <span class="marca-sinal" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><path d="M2 6h12v10H2zM14 9h4l4 4v3h-8z"/></svg>
+              </span>
+              <span>{SITE.nome}</span>
+            </a>
+            <p>{SITE.slogan}. Atendimento para quem precisa contratar frete ou mudança.</p>
+            <p>{SITE.horario}</p>
+            <p><a href={wa} target="_blank" rel="noopener">Orçamento pelo WhatsApp</a></p>
+          </div>
+          <div>
+            <p class="rodape-titulo">Serviços</p>
+            <ul>{SERVICOS.map((s) => <li><a href={`/servicos/${s.slug}/`}>{s.nome}</a></li>)}</ul>
+          </div>
+          <div>
+            <p class="rodape-titulo">Bairros</p>
+            <ul>
+              {BAIRROS.slice(0, 6).map((b) => <li><a href={`/bairros/${b.slug}/`}>{b.nome}</a></li>)}
+              <li><a href="/bairros/">Todos os bairros</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="rodape-titulo">Região</p>
+            <ul>
+              {CIDADES.slice(0, 5).map((c) => <li><a href={`/cidades/${c.slug}/`}>{c.nome}</a></li>)}
+              <li><a href="/perguntas-frequentes/">Perguntas frequentes</a></li>
+              <li><a href="/blog/">Blog</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="rodape-fim">
+          <span>© {new Date().getFullYear()} {SITE.nome}. Uberaba, MG.</span>
+          <span><a href="/privacidade/">Privacidade</a> · Fotos: Pexels</span>
+        </div>
+      </div>
+    </footer>
+
+    <a class="whats" href={wa} target="_blank" rel="noopener" aria-label="Pedir orçamento pelo WhatsApp">
+      <WaIcon />
+      <span>Orçamento no WhatsApp</span>
+    </a>
+  </body>
+</html>

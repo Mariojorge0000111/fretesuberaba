@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cta from '../../components/Cta.astro';
+import Img from '../../components/Img.astro';
+import { POSTS } from '../../lib/posts';
+const [destaque, ...resto] = POSTS;
+---
+<Base title="Blog: Guias de Frete e Mudança em Uberaba" description="Quanto custa frete e mudança em Uberaba, checklists, como transportar geladeira e sofá, mudança para BH e São Paulo e dicas para estudantes e empresas.">
+  <section class="hero-pagina">
+    <div class="wrap">
+      <nav class="migalhas" aria-label="Você está em"><a href="/">Início</a> / Blog</nav>
+      <h1>Guias de frete e mudança</h1>
+      <p class="lead" style="margin-top:18px">Textos práticos para planejar seu frete ou sua mudança em Uberaba e na região.</p>
+    </div>
+  </section>
+  <section class="wrap" style="padding-bottom:96px">
+    {destaque && (
+      <a class="card dividido" href={`/blog/${destaque.slug}/`} style="margin-bottom:64px;display:grid">
+        <Img nome={destaque.imagem} alt={destaque.imagemAlt} prioridade />
+        <div>
+          <h2 style="font-size:clamp(1.7rem,3.4vw,2.4rem)">{destaque.titulo}</h2>
+          <p style="margin-top:14px;font-size:1.05rem">{destaque.descricao}</p>
+        </div>
+      </a>
+    )}
+    <div class="cards">
+      {resto.map((p) => (
+        <a class="card" href={`/blog/${p.slug}/`}>
+          <Img nome={p.imagem} alt={p.imagemAlt} sizes="(max-width: 760px) 100vw, 33vw" />
+          <h3>{p.titulo}</h3>
+          <p>{p.descricao}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+  <Cta />
+</Base>

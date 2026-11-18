@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import Cta from '../components/Cta.astro';
+import Faq from '../components/Faq.astro';
+import { puro } from '../lib/md';
+
+const grupos = [
+  {
+    titulo: 'Orçamento e preço',
+    itens: [
+      { p: 'Como peço um orçamento?', r: 'Pelo WhatsApp ou pelo [formulário de orçamento](/orcamento/). Informe o que vai levar, os bairros ou cidades de origem e destino, se tem escada ou elevador nos dois endereços e a data desejada. Fotos dos itens maiores deixam o valor mais preciso.' },
+      { p: 'Por que vocês não mostram preço no site?', r: 'Porque não existe um preço que sirva para todo mundo. Duas mudanças de "apartamento de dois quartos" podem ter volumes muito diferentes, e um terceiro andar sem elevador muda tudo. Preferimos passar um valor fechado para o seu caso a mostrar uma tabela que não vale na prática.' },
+      { p: 'O que faz o valor subir ou descer?', r: 'Volume, distância, acesso (escadas, elevador, distância do caminhão até a porta), número de ajudantes, montagem e desmontagem, embalagem e a data. Fim e começo de mês costumam ter mais procura. Veja os detalhes em [quanto custa uma mudança em Uberaba](/blog/quanto-custa-mudanca-em-uberaba/).' },
+      { p: 'O orçamento é cobrado?', r: 'Não. O orçamento pelo WhatsApp é gratuito e sem compromisso.' },
+      { p: 'O valor pode mudar no dia?', r: 'O valor combinado vale para o que foi informado. Se no dia aparecerem itens que não estavam na lista ou um acesso diferente do descrito, isso é conversado antes de qualquer coisa. Por isso a lista e as fotos são importantes.' },
+      { p: 'Quais formas de pagamento são aceitas?', r: 'As formas de pagamento são combinadas no orçamento.' },
+    ],
+  },
+  {
+    titulo: 'Agendamento',
+    itens: [
+      { p: 'Com quanta antecedência devo agendar?', r: 'Para mudança completa, de uma a duas semanas. Para carreto e frete de poucos itens, às vezes dá para encaixar em poucos dias. No fim e no começo do mês, reserve mais cedo.' },
+      { p: 'Vocês trabalham no sábado?', r: 'Sim. O atendimento vai de segunda a sábado, das 7h às 19h.' },
+      { p: 'Fazem frete no mesmo dia?', r: 'Quando há espaço na agenda, sim. Quanto mais cedo você chamar, maior a chance. Veja dicas em [frete urgente em Uberaba](/blog/frete-urgente-em-uberaba/).' },
+      { p: 'E se chover no dia da mudança?', r: 'A carga vai em caminhão baú fechado e os móveis vão protegidos com manta e plástico. Com chuva forte, a carga e a descarga podem ser pausadas até a chuva diminuir. Entre outubro e março, quando chove mais em Uberaba, é bom ter isso em mente.' },
+    ],
+  },
+  {
+    titulo: 'Durante a mudança',
+    itens: [
+      { p: 'Preciso embalar tudo antes?', r: 'Depende do que você contratar. Você pode embalar tudo, embalar só o que não é frágil ou contratar a embalagem completa.' },
+      { p: 'Vocês desmontam e montam móveis?', r: 'Sim, quando combinado: guarda-roupas, camas, berços, racks, estantes e mesas. Veja [montagem e desmontagem](/servicos/montagem-e-desmontagem/).' },
+      { p: 'Preciso estar presente?', r: 'Sim, é recomendado que alguém responsável esteja nos dois endereços, para indicar onde fica cada coisa e conferir a entrega.' },
+      { p: 'O que não devo colocar no caminhão?', r: 'Documentos, dinheiro, joias, remédios de uso diário, eletrônicos pequenos, botijão de gás cheio, produtos inflamáveis e animais. Leve com você o que é valioso ou indispensável.' },
+      { p: 'Vocês levam animais de estimação?', r: 'Não. Pets devem ir com você, no seu carro ou com alguém da família. Veja dicas em [mudança com pets](/blog/mudanca-com-pets/).' },
+      { p: 'E se o móvel não passar pela porta ou elevador?', r: 'Avaliamos antes, pelas fotos e medidas. As saídas são desmontar o móvel, tirar a porta das dobradiças ou içar pela janela ou sacada, quando é seguro.' },
+    ],
+  },
+  {
+    titulo: 'Cidades e regiões',
+    itens: [
+      { p: 'Vocês atendem todos os bairros de Uberaba?', r: 'Sim, a cidade inteira. Veja os [bairros atendidos](/bairros/).' },
+      { p: 'Fazem mudança para outras cidades e estados?', r: 'Sim. Uberlândia, Araxá, Sacramento, Delta, Frutal, Conceição das Alagoas, Igarapava, Belo Horizonte, São Paulo e outras rotas, combinadas no orçamento. Veja [mudança para outras cidades](/servicos/mudanca-para-outras-cidades/).' },
+      { p: 'Precisa de documento para mudança entre estados?', r: 'Para bens de uso pessoal, o recomendado é levar a declaração de conteúdo com a lista dos itens, assinada por você.' },
+      { p: 'Este site é para caminhoneiros que procuram carga?', r: 'Não. O site é para quem precisa contratar frete, carreto ou mudança. Não divulgamos fretes de carga para motoristas.' },
+    ],
+  },
+];
+const todas = grupos.flatMap((g) => g.itens);
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: todas.map((f) => ({ '@type': 'Question', name: f.p, acceptedAnswer: { '@type': 'Answer', text: puro(f.r) } })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: new URL('/', Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: 'Perguntas frequentes', item: new URL('/perguntas-frequentes/', Astro.site).href },
+    ],
+  },
+];
+---
+<Base title="Perguntas Frequentes sobre Frete e Mudança em Uberaba" description="Respostas sobre orçamento, preço, agendamento, montagem de móveis, chuva, documentos e mudança para outras cidades. Tire suas dúvidas antes de contratar." schema={schema} msg="Olá! Vim pelo site Fretes Uberaba (perguntas frequentes) e tenho uma dúvida sobre frete/mudança.">
+  <section class="hero-pagina">
+    <div class="texto">
+      <nav class="migalhas" aria-label="Você está em"><a href="/">Início</a> / Perguntas frequentes</nav>
+      <h1>Perguntas frequentes</h1>
+      <p class="lead" style="margin-top:18px">O que as pessoas mais perguntam antes de contratar um frete ou uma mudança em Uberaba.</p>
+    </div>
+  </section>
+  <section class="texto" style="padding-bottom:96px">
+    {grupos.map((g) => (
+      <div style="margin-top:48px">
+        <h2 style="font-size:clamp(1.5rem,3vw,2rem);margin-bottom:16px">{g.titulo}</h2>
+        <Faq itens={g.itens} />
+      </div>
+    ))}
+  </section>
+  <Cta titulo="Não achou sua dúvida?" texto="Pergunte direto pelo WhatsApp. A resposta vem junto com o orçamento, se você quiser." />
+</Base>

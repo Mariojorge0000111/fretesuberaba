@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import Img from '../components/Img.astro';
+import WaIcon from '../components/WaIcon.astro';
+import { SITE, linkWhatsapp } from '../config';
+import { SERVICOS } from '../data/servicos';
+---
+<Base title="Orçamento de Frete e Mudança em Uberaba" description="Peça seu orçamento de frete, carreto ou mudança em Uberaba: preencha nome, origem, destino, data e itens, e o pedido abre pronto no WhatsApp." ogImage="orcamento" msg="Olá! Vim pelo site Fretes Uberaba (página de orçamento) e quero um orçamento.">
+  <section class="hero-pagina">
+    <div class="wrap">
+      <nav class="migalhas" aria-label="Você está em"><a href="/">Início</a> / Orçamento</nav>
+      <h1>Peça seu orçamento</h1>
+      <p class="lead" style="margin-top:18px">Preencha os campos e o pedido abre pronto no WhatsApp. Quanto mais detalhes, mais preciso o valor.</p>
+    </div>
+  </section>
+
+  <section class="wrap dividido" style="padding-bottom:96px;align-items:start">
+    <form class="form caixa" id="orcamento">
+      <label>Seu nome<input name="nome" autocomplete="name" required /></label>
+      <label>Serviço
+        <select name="servico">
+          {SERVICOS.map((s) => <option>{s.nome}</option>)}
+          <option>Não sei, quero ajuda para escolher</option>
+        </select>
+      </label>
+      <div class="duas">
+        <label>Origem (bairro ou cidade)<input name="origem" placeholder="Ex.: Abadia, Uberaba" required /></label>
+        <label>Destino (bairro ou cidade)<input name="destino" placeholder="Ex.: Uberlândia" required /></label>
+      </div>
+      <div class="duas">
+        <label>Data desejada<input name="data" type="date" /></label>
+        <label>Escada ou elevador?
+          <select name="acesso">
+            <option>Casa / térreo</option><option>Prédio com elevador</option><option>Prédio sem elevador</option><option>Não sei</option>
+          </select>
+        </label>
+      </div>
+      <label>O que vai levar<textarea name="itens" rows="4" placeholder="Ex.: geladeira, sofá de 3 lugares, cama de casal, guarda-roupa e 20 caixas"></textarea></label>
+      <button class="btn" type="submit"><WaIcon /> Enviar pelo WhatsApp</button>
+      <p class="nota">O WhatsApp abre com a mensagem pronta. Nada é enviado antes de você tocar em enviar, e o site não guarda seus dados.</p>
+    </form>
+    <div>
+      <Img nome="orcamento" alt="Jovem pensativa ao lado de caixas de mudança, planejando a mudança" />
+      <div style="margin-top:32px">
+        <h2 style="font-size:1.7rem">Prefere conversar?</h2>
+        <p style="margin-top:12px;color:var(--suave)">Chame no WhatsApp e mande fotos dos itens. {SITE.horario}.</p>
+        <p class="acoes"><a class="btn btn-escuro" href={linkWhatsapp('Olá! Vim pelo site Fretes Uberaba (página de orçamento) e quero um orçamento.')} target="_blank" rel="noopener"><WaIcon /> Abrir o WhatsApp</a></p>
+      </div>
+    </div>
+  </section>
+
+  <script define:vars={{ numero: SITE.whatsapp }}>
+    document.getElementById('orcamento').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const d = new FormData(e.target);
+      const data = d.get('data') ? new Date(d.get('data') + 'T12:00').toLocaleDateString('pt-BR') : 'a combinar';
+      const msg = [
+        'Olá! Vim pelo site Fretes Uberaba (formulário de orçamento).',
+        `Nome: ${d.get('nome')}`,
+        `Serviço: ${d.get('servico')}`,
+        `Origem: ${d.get('origem')}`,
+        `Destino: ${d.get('destino')}`,
+        `Data: ${data}`,
+        `Acesso: ${d.get('acesso')}`,
+        `O que vou levar: ${d.get('itens') || 'vou mandar fotos'}`,
+      ].join('\n');
+      window.open(`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+    });
+  </script>
+</Base>

@@ -1,0 +1,50 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cta from '../../components/Cta.astro';
+import Img from '../../components/Img.astro';
+import { CIDADES } from '../../data/cidades';
+import { post } from '../../lib/posts';
+
+const rotas = [
+  { slug: 'mudanca-uberaba-belo-horizonte', nome: 'Belo Horizonte' },
+  { slug: 'mudanca-uberaba-sao-paulo', nome: 'São Paulo' },
+  { slug: 'mudanca-uberaba-ribeirao-preto', nome: 'Ribeirão Preto' },
+  { slug: 'mudanca-uberaba-goiania', nome: 'Goiânia' },
+  { slug: 'mudanca-uberaba-franca', nome: 'Franca' },
+].filter((r) => post(r.slug));
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Início', item: new URL('/', Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: 'Outras cidades', item: new URL('/cidades/', Astro.site).href },
+  ],
+};
+---
+<Base title="Mudança de Uberaba para Outras Cidades da Região" description="Mudança e frete entre Uberaba e Uberlândia, Araxá, Sacramento, Delta, Frutal, Conceição das Alagoas e Igarapava, nos dois sentidos. Orçamento pelo WhatsApp." schema={schema} ogImage="regiao">
+  <section class="hero-pagina">
+    <div class="wrap">
+      <nav class="migalhas" aria-label="Você está em"><a href="/">Início</a> / Outras cidades</nav>
+      <h1>Mudança entre Uberaba e a região</h1>
+      <p class="lead" style="margin-top:18px">Rotas curtas e médias pelo Triângulo Mineiro e pela divisa com São Paulo, nos dois sentidos.</p>
+    </div>
+  </section>
+  <div class="post-capa"><Img nome="regiao" alt="Vista aérea de estradas de terra cortando lavouras no interior" prioridade sizes="(max-width: 1040px) 100vw, 1000px" /></div>
+  <section class="wrap" style="padding-bottom:96px">
+    <div class="cards">
+      {CIDADES.map((c) => (
+        <a class="card" href={`/cidades/${c.slug}/`} style="background:var(--branco);border:1px solid var(--linha);border-radius:var(--raio-m);padding:24px">
+          <h3>Uberaba ↔ {c.nome} ({c.uf})</h3>
+          <p>{c.distancia} · {c.caminho}</p>
+        </a>
+      ))}
+    </div>
+    {rotas.length > 0 && (
+      <>
+        <h2 style="margin:72px 0 20px;font-size:clamp(1.5rem,3vw,2rem)">Rotas longas</h2>
+        <ul class="chips">{rotas.map((r) => <li><a href={`/blog/${r.slug}/`}>Uberaba → {r.nome}</a></li>)}</ul>
+      </>
+    )}
+  </section>
+  <Cta />
+</Base>

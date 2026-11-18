@@ -1,0 +1,10 @@
+---
+import { linkWhatsapp } from '../config';
+import WaIcon from './WaIcon.astro';
+interface Props { texto?: string; mensagem?: string; }
+const { texto = 'Quer saber quanto fica no seu caso? Mande os itens e os endereços e receba o orçamento.', mensagem } = Astro.props;
+---
+<div class="cta-meio">
+  <p>{texto}</p>
+  <a class="btn" href={linkWhatsapp(mensagem)} target="_blank" rel="noopener"><WaIcon /> Chamar no WhatsApp</a>
+</div>

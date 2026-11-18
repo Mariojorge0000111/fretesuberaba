@@ -1,0 +1,106 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cta from '../../components/Cta.astro';
+import CtaMeio from '../../components/CtaMeio.astro';
+import Faq from '../../components/Faq.astro';
+import Img from '../../components/Img.astro';
+import Secoes from '../../components/Secoes.astro';
+import WaIcon from '../../components/WaIcon.astro';
+import { linkWhatsapp } from '../../config';
+import { CIDADES, type Cidade } from '../../data/cidades';
+import { postsDe } from '../../lib/posts';
+import { puro } from '../../lib/md';
+
+export function getStaticPaths() {
+  return CIDADES.map((c) => ({ params: { slug: c.slug }, props: { c } }));
+}
+const { c } = Astro.props as { c: Cidade };
+const url = new URL(`/cidades/${c.slug}/`, Astro.site).href;
+const artigos = postsDe(c.artigos).slice(0, 3);
+const outras = CIDADES.filter((o) => o.slug !== c.slug);
+const msg = `Olá! Vim pelo site Fretes Uberaba (página Uberaba e ${c.nome}) e quero um orçamento de mudança/frete.`;
+const [primeira, ...demais] = c.secoes;
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: c.h1,
+    serviceType: 'Mudança e frete intermunicipal',
+    areaServed: [{ '@type': 'City', name: 'Uberaba' }, { '@type': 'City', name: `${c.nome} - ${c.uf}` }],
+    provider: { '@id': new URL('/#empresa', Astro.site).href },
+    url,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: c.faq.map((f) => ({ '@type': 'Question', name: f.p, acceptedAnswer: { '@type': 'Answer', text: puro(f.r) } })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: new URL('/', Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: 'Outras cidades', item: new URL('/cidades/', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: c.nome, item: url },
+    ],
+  },
+];
+---
+<Base title={c.titulo} description={c.descricao} schema={schema} msg={msg} ogImage="servico-mudanca-para-outras-cidades">
+  <section class="hero-pagina">
+    <div class="wrap">
+      <nav class="migalhas" aria-label="Você está em"><a href="/">Início</a> / <a href="/cidades/">Outras cidades</a> / {c.nome}</nav>
+      <h1>{c.h1}</h1>
+      <p class="lead" style="margin-top:18px">{c.sobre}</p>
+      <div class="acoes"><a class="btn" href={linkWhatsapp(msg)} target="_blank" rel="noopener"><WaIcon /> Pedir orçamento no WhatsApp</a></div>
+    </div>
+  </section>
+
+  <section class="texto conteudo">
+    <div class="dados">
+      <div><span>Distância</span><strong>{c.distancia}</strong></div>
+      <div><span>Tempo de viagem</span><strong>{c.tempo}</strong></div>
+      <div><span>Caminho</span><strong>{c.caminho}</strong></div>
+    </div>
+    <p class="nota" style="margin-top:10px">Valores aproximados, a partir do centro de Uberaba.</p>
+    <Secoes secoes={[primeira]} />
+    <CtaMeio texto={`Vai mudar entre Uberaba e ${c.nome}? Mande a lista dos itens e os dois endereços.`} mensagem={msg} />
+    <Secoes secoes={demais} />
+  </section>
+
+  <section class="secao">
+    <div class="texto">
+      <h2 style="margin-bottom:28px">Perguntas sobre a rota Uberaba ↔ {c.nome}</h2>
+      <Faq itens={c.faq} />
+    </div>
+  </section>
+
+  {artigos.length > 0 && (
+    <section class="secao secao-branca">
+      <div class="wrap">
+        <div class="cabeca"><h2>Guias úteis</h2></div>
+        <div class="cards">
+          {artigos.map((p) => (
+            <a class="card" href={`/blog/${p.slug}/`}>
+              <Img nome={p.imagem} alt={p.imagemAlt} sizes="(max-width: 760px) 100vw, 33vw" />
+              <h3>{p.titulo}</h3>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="secao secao-areia">
+    <div class="wrap">
+      <h2 style="margin-bottom:28px">Outras cidades da região</h2>
+      <ul class="chips">
+        {outras.map((o) => <li><a href={`/cidades/${o.slug}/`}>Uberaba ↔ {o.nome}</a></li>)}
+        <li><a href="/servicos/mudanca-para-outras-cidades/">Mudança para outras cidades</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <Cta titulo={`Uberaba ↔ ${c.nome}: peça seu orçamento.`} mensagem={msg} />
+</Base>
