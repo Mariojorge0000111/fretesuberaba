@@ -1,5 +1,6 @@
-# Publica os artigos agendados: todo dia de manhã verifica se há artigo com a data de hoje
-# e, se houver, dispara um novo build na Cloudflare Pages pelo deploy hook.
+# Publica os artigos agendados: todo dia de manhã verifica se há artigo com a data de hoje.
+# Se houver, registra a publicação em src/data/publicacoes.txt e faz um commit na main.
+# O push dispara o build automático da Cloudflare Pages, que libera o artigo do dia.
 name: Publicar artigos agendados
 
 on:
@@ -7,24 +8,25 @@ on:
     - cron: '7 9 * * *' # 06:07 em Uberaba (UTC-3)
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   publicar:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verifica artigos com a data de hoje
-        id: hoje
+      - name: Publica artigos com a data de hoje
         run: |
           HOJE=$(TZ=America/Sao_Paulo date +%F)
-          if grep -l "^data: \"$HOJE\"" src/content/blog/*.md; then
-            echo "publicar=sim" >> "$GITHUB_OUTPUT"
-          else
-            echo "Nenhum artigo agendado para $HOJE"
+          ARTIGOS=$(grep -l "^data: \"$HOJE\"" src/content/blog/*.md || true)
+          if [ -z "$ARTIGOS" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "Nenhum artigo agendado para $HOJE"; exit 0
           fi
-      - name: Dispara build na Cloudflare Pages
-        if: steps.hoje.outputs.publicar == 'sim' || github.event_name == 'workflow_dispatch'
-        env:
-          HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
-        run: |
-          if [ -z "$HOOK" ]; then echo "Secret CLOUDFLARE_DEPLOY_HOOK não configurado"; exit 1; fi
-          curl -fsS -X POST "$HOOK"
+          for a in $ARTIGOS; do echo "$HOJE $(basename "$a" .md)" >> src/data/publicacoes.txt; done
+          [ -z "$ARTIGOS" ] && echo "$HOJE rebuild manual" >> src/data/publicacoes.txt
+          git config user.name "Mário Jorge"
+          git config user.email "Mariojorge0000111@users.noreply.github.com"
+          git add src/data/publicacoes.txt
+          git commit -m "Publica artigos agendados de $HOJE"
+          git push

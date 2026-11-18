@@ -11,7 +11,7 @@ Site de aluguel (rank and rent) do Mário Jorge. Ranqueia no Google para fretes 
 ## Artigos agendados
 - Artigos ficam em `src/content/blog/*.md`. Frontmatter: `titulo`, `descricao`, `data`, `imagem` (nome do arquivo em /public/images, sem extensão), `imagemAlt`, `palavraChave`, `servico`, `bairro`/`cidade` (opcionais), `faq`.
 - Só são publicados os artigos com `data` menor ou igual a hoje (fuso de São Paulo). Links para artigos ainda não publicados viram texto simples até a data chegar.
-- `.github/workflows/publicar-agendados.yml` roda todo dia às 06:07 e, se houver artigo com a data do dia, chama o deploy hook da Cloudflare (secret `CLOUDFLARE_DEPLOY_HOOK`).
+- `.github/workflows/publicar-agendados.yml` roda todo dia às 06:07 e, se houver artigo com a data do dia, anota em `src/data/publicacoes.txt` e faz um commit; o push dispara o build da Cloudflare.
 - `[[CTA]]` sozinho numa linha do artigo vira o botão de WhatsApp no meio do texto.
 
 ## Onde fica cada coisa
