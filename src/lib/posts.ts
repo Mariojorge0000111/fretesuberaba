@@ -27,7 +27,7 @@ export const TODOS: Post[] = Object.entries(arquivos).map(([caminho, m]) => ({
   compiledContent: m.compiledContent,
 }));
 
-const hoje = hojeISO();
+const hoje = process.env.HOJE ?? hojeISO(); // HOJE=AAAA-MM-DD só para testes locais
 export const POSTS: Post[] = TODOS.filter((p) => p.data <= hoje).sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : a.slug.localeCompare(b.slug)));
 const publicados = new Set(POSTS.map((p) => p.slug));
 
