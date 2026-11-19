@@ -64,6 +64,7 @@ import { SERVICOS } from '../data/servicos';
         `Acesso: ${d.get('acesso')}`,
         `O que vou levar: ${d.get('itens') || 'vou mandar fotos'}`,
       ].join('\n');
+      if (window.gtag) window.gtag('event', 'clique_whatsapp', { local_botao: 'formulario', servico: d.get('servico'), pagina: location.pathname, transport_type: 'beacon' });
       window.open(`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
     });
   </script>

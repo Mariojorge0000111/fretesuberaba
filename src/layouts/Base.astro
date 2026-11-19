@@ -78,6 +78,29 @@ const wa = linkWhatsapp(msg);
     {preloadImg && <link rel="preload" as="image" href={`/images/${preloadImg}.webp`} imagesrcset={`/images/${preloadImg}-800.webp 800w, /images/${preloadImg}.webp 1600w`} imagesizes="(max-width: 760px) 100vw, 45vw" fetchpriority="high" />}
     <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
     {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+    {SITE.ga4 && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${SITE.ga4}`}></script>
+        <script is:inline define:vars={{ ga4: SITE.ga4 }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('config', ga4);
+          // Lead: todo clique em link do WhatsApp vira o evento clique_whatsapp, com o lugar do botão
+          document.addEventListener('click', function (e) {
+            var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+            if (!a) return;
+            var local = a.classList.contains('whats') ? 'botao_fixo'
+              : a.closest('.cta-meio') ? 'meio_do_texto'
+              : a.closest('.cta') ? 'cta_final'
+              : a.closest('.hero, .hero-pagina') ? 'topo'
+              : a.closest('.rodape') ? 'rodape' : 'outro';
+            gtag('event', 'clique_whatsapp', { local_botao: local, pagina: location.pathname, transport_type: 'beacon' });
+          });
+        </script>
+      </>
+    )}
   </head>
   <body>
     <header class="topo">

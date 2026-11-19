@@ -15,6 +15,9 @@ export const SITE = {
   mensagemWhatsapp: 'Olá! Vim pelo site Fretes Uberaba e quero um orçamento de frete/mudança.',
 
   horario: 'Segunda a sábado, das 7h às 19h',
+
+  // Google Analytics 4 (deixe vazio para desligar). Evento de lead: clique_whatsapp
+  ga4: 'G-N7KHXBS5C9',
 };
 
 export function linkWhatsapp(mensagem = SITE.mensagemWhatsapp): string {

@@ -15,7 +15,7 @@ Site de aluguel (rank and rent) do Mário Jorge. Ranqueia no Google para fretes 
 - `[[CTA]]` sozinho numa linha do artigo vira o botão de WhatsApp no meio do texto.
 
 ## Onde fica cada coisa
-- `src/config.ts`: nome, WhatsApp, horário.
+- `src/config.ts`: nome, WhatsApp, horário e ID do Google Analytics 4 (`ga4`). Cada clique em link do WhatsApp (e envio do formulário) gera o evento `clique_whatsapp` com o parâmetro `local_botao`.
 - `src/data/servicos.ts`: 6 serviços (`/servicos/<slug>/`).
 - `src/data/bairros.ts`: 14 bairros com texto único (`/bairros/<slug>/`) e lista de outros bairros.
 - `src/data/cidades.ts`: 7 cidades da região (`/cidades/<slug>/`).
