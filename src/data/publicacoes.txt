@@ -14,3 +14,4 @@
 2026-11-18 qual-caminhao-para-mudanca
 2026-11-18 quanto-custa-carreto-em-uberaba
 2026-11-18 quanto-custa-mudanca-em-uberaba
+2026-11-21 como-transportar-maquina-de-lavar
